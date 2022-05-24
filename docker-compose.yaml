@@ -7,8 +7,8 @@ services:
     image: yandex/clickhouse-server
     container_name: click-server
     ports:
-      - 8123:8123
-      - 9000:9000
+      - 8123
+      - 9000
     volumes:
       - ./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -36,10 +36,10 @@ services:
       - ./config/carbon-clickhouse/carbon-clickhouse.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf
       - ./logs/carbon-clickhouse:/var/log
     ports:
-      - 2003:2003 # plain tcp
+      - 2003 # plain tcp
       - 2003:2003/udp # plain udp
-      - 2004:2004 # pickle
-      - 2006:2006 # prometheus remote write
+      - 2004 # pickle
+      - 2006 # prometheus remote write
     networks:
       - network
   graphite-clickhouse:

@@ -1,10 +1,11 @@
-Комплексная подборка инструментов мониторинга Grafana
+Комплексная подборка инструментов мониторинга с отображением в Grafana
 ========
 
 Решение по мониторингу [Grafana](http://grafana.org/) +  [ClickHouse](http://clickhouse.com/)
 
-## Install
+Хранение метрик происходит в Graphite, но СУБД вместо wisper используется clickhouse
 
+## Install
 
 
 ### Клонируем репозиторий на диск и запускаем compose up:
@@ -31,16 +32,18 @@ docker-compose -v
 ```
 
 ## Список контейнеров:
-ClickHouse авторизация как пользователь:***default*** пароль: ***''***.
+ClickHouse авторизация в WEB GUI как пользователь:***default*** пароль: ***''***.
 
-* ClickHouse (база данных для метрик) `http://localhost:8123`
-* ClickHouse (коммандный клиент на 9000 порту)
+* click-server (база данных для метрик) `http://localhost:8123` (простой GUI нтерфейс) `http://localhost:8123/play`
+* click-client (коммандный клиент на 9000 порту)
 ```
 ./client.sh
 ```
-* ClickHouse (простой GUI нтерфейс) `http://localhost:8123/play`
-
-
+* [tabix-gui](http://tabix.io/) (GUI WEB интерфейс для CLickHouse ) `http://localhost:82`
+* [graphite-gui](https://graphiteapp.org/) (GUI WEB интерфейс для Graphite, front-end ) `http://localhost:81`
+* [carbone-clickhouse](https://github.com/go-graphite/carbon-clickhouse) (демон, принимающий метрики Graphite ) `порты 2003,2004,200б`
+* [graphite-clickhouse](https://github.com/go-graphite/graphite-clickhouse) (бэкенд Graphite с поддержкой ClickHouse ) 
+* [grafana-gui](https://grafana.com/) (GUI WEB интерфейс для отображения местрик ) `http://localhost:3000`
 
 ## Настройка Grafana
 
