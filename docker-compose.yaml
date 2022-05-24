@@ -1,0 +1,88 @@
+version: "3.5"
+networks:
+  network:
+    driver: bridge
+services:
+  clickhouse:
+    image: yandex/clickhouse-server
+    container_name: click-server
+    ports:
+      - 8123:8123
+      - 9000:9000
+    volumes:
+      - ./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/clickhouse:/var/lib/clickhouse
+      - ./logs/clickhouse-server:/log/clickhouse-server
+      - ./config/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./config/clickhouse/users.xml:/etc/clickhouse-server/users.xml
+      - ./config/clickhouse/users.d:/etc/clickhouse-server/users.d
+    networks:
+      - network
+  clickhouse-client:
+    image: yandex/clickhouse-client
+    container_name: click-client
+    entrypoint:
+      - /bin/sleep
+    command:
+      - infinity
+    networks:
+      - network
+  carbon-clickhouse:
+    image: ghcr.io/lomik/carbon-clickhouse:0.11.2
+    container_name: carbon-clickhouse
+    volumes:
+      - ./data:/data
+      - ./config/carbon-clickhouse/carbon-clickhouse.conf:/etc/carbon-clickhouse/carbon-clickhouse.conf
+      - ./logs/carbon-clickhouse:/var/log
+    ports:
+      - 2003:2003 # plain tcp
+      - 2003:2003/udp # plain udp
+      - 2004:2004 # pickle
+      - 2006:2006 # prometheus remote write
+    networks:
+      - network
+  graphite-clickhouse:
+    image: ghcr.io/lomik/graphite-clickhouse:0.13.2
+    container_name: graphite-clickhouse
+    volumes:
+    - ./rollup.xml:/etc/graphite-clickhouse/rollup.xml
+    - ./config/graphite-clickhouse/graphite-clickhouse.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf
+    - ./logs/graphite-clickhouse:/var/log/
+    networks:
+      - network
+  grafana-gui:
+    image: grafana/grafana
+    container_name: grafana-gui
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      #- ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    expose:
+      - 3000
+    networks:
+      - network
+  tabix-gui:
+    image: spoonest/clickhouse-tabix-web-client
+    container_name: tabix-gui
+    networks:
+      - network
+
+    ports:
+      - 82:80 # http ui tabix.io
+  graphite-gui:
+    image: graphiteapp/graphite-statsd:1.1.8-1
+    container_name: graphite-gui
+    volumes:
+    - ./graphiteweb_entrypoint.sh:/entrypoint.sh
+    - ./config/graphite-web/graphiteweb.conf:/opt/graphite/webapp/graphite/local_settings.py
+    entrypoint: /entrypoint.sh
+    networks:
+      - network
+    ports:
+      - 81:80 # http ui graphite
+
+
