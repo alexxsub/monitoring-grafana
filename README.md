@@ -1,25 +1,47 @@
-# Quick Start
-```sh
-git clone https://github.com/lomik/graphite-clickhouse-tldr
-cd graphite-clickhouse-tldr
-export UID
-docker-compose up
+Комплексная подборка инструментов мониторинга Grafana
+========
+
+Решение по мониторингу [Grafana](http://grafana.org/) +  [ClickHouse](http://clickhouse.com/)
+
+## Install
+
+
+
+### Клонируем репозиторий на диск и запускаем compose up:
+
 ```
-Open http://127.0.0.1:81/ in browser UI Graphite
-Open http://127.0.0.1:82/ in browser UI tabix.io  (host:localhost:8123,user:default, password:'')
-
-### Mapped Ports
-
-Host | Container | Service
----- | --------- | -------------------------------------------------------------------------------------------------------------------
-  80 |        80 | [nginx](https://www.nginx.com/resources/admin-guide/)
-2003 |      2003 | [carbon receiver - plaintext](http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-plaintext-protocol)
-2004 |      2004 | [carbon receiver - pickle](http://graphite.readthedocs.io/en/latest/feeding-carbon.html#the-pickle-protocol)
-2006 |      2006 | [carbon receiver - prometheus remote write](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cremote_write%3E)
-
-
-### Additional cmds Cat config
-```sh
-sudo docker exec -it clickhouse-server cat /etc/clickhouse-server/users.xml > config/clickhouse/users.xml
-sudo docker exec -it clickhouse-server cat /etc/clickhouse-server/config.xml > config/clickhouse/config.xml
+git clone https://github.com/alexxsub/monitoring-grafana.git
+cd monitoring-grafana
+docker-compose up -d
 ```
+
+### Переменные окружения .env:
+```
+ADMIN_USER=admin  
+ADMIN_PASSWORD=admin
+```
+
+## Требования
+
+* Docker Engine >= 1.13
+* Docker Compose >= 1.11
+```
+docker -v
+docker-compose -v
+```
+
+## Список контейнеров:
+ClickHouse авторизация как пользователь:***default*** пароль: ***''***.
+
+* ClickHouse (база данных для метрик) `http://localhost:8123`
+* ClickHouse (коммандный клиент на 9000 порту)
+```
+./client.sh
+```
+* ClickHouse (простой GUI нтерфейс) `http://localhost:8123/play`
+
+
+
+## Настройка Grafana
+
+Переходим по ссылке `http://localhost:3000`  и авторизуемся как пользователь:***admin*** пароль: ***admin***. Это дефолтные учетные данные, они прописываются в .env, либо замените пароль на свой. Графана потребует сменить пароль
