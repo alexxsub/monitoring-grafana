@@ -3,12 +3,12 @@ networks:
   network:
     driver: bridge
 services:
-  clickhouse:
+  click-server:
     image: yandex/clickhouse-server
     container_name: click-server
     ports:
-      - 8123
-      - 9000
+      - 8123:8123
+      - 9000:9000
     volumes:
       - ./rollup.xml:/etc/clickhouse-server/config.d/rollup.xml
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -19,7 +19,7 @@ services:
       - ./config/clickhouse/users.d:/etc/clickhouse-server/users.d
     networks:
       - network
-  clickhouse-client:
+  click-client:
     image: yandex/clickhouse-client
     container_name: click-client
     entrypoint:
@@ -48,7 +48,7 @@ services:
     volumes:
     - ./rollup.xml:/etc/graphite-clickhouse/rollup.xml
     - ./config/graphite-clickhouse/graphite-clickhouse.conf:/etc/graphite-clickhouse/graphite-clickhouse.conf
-    - ./logs/graphite-clickhouse:/var/log/
+    - ./logs/graphite-clickhouse:/var/log
     networks:
       - network
   grafana-gui:
@@ -83,6 +83,4 @@ services:
     networks:
       - network
     ports:
-      - 81:80 # http ui graphite
-
-
+      - 83:80 # http ui graphite
